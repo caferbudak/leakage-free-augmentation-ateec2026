@@ -1,0 +1,8 @@
+file,n,features,classes,missing_cells,note
+pelvic,310,6,"{0: 210, 1: 100}",0,"UCI Vertebral Column 2C; target 0=AB, 1=NO (source coding)"
+parkinsons,195,22,"{0: 48, 1: 147}",0,UCI Parkinsons; name and status removed from features; target=status (1=patient)
+hepatitis,155,19,"{0: 123, 1: 32}",167,"UCI Hepatitis; bool->1/0, sex->1/0; target 1=die; missing values KEPT (within-fold imputation)"
+heart_disease,303,13,"{0: 164, 1: 139}",6,UCI Cleveland; target 1=disease present (num>0); missing values KEPT
+pima_diabetes,768,8,"{0: 500, 1: 268}",0,UCI Pima; target 1=diabetes
+glass,214,9,"{0: 51, 1: 163}",0,"UCI Glass; binary: 1=window glass (types 1-4), 0=non-window (types 5-7)"
+sonar,208,60,"{0: 97, 1: 111}",0,"UCI Sonar; target 1=mine (M), 0=rock (R)"

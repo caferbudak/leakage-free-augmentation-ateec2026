@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# Operating system
+.DS_Store
+Thumbs.db
+
+# Temporary / output
+*.log
+*.tmp
+*.pdf
+~$*.docx
