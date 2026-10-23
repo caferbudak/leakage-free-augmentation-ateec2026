@@ -3,7 +3,9 @@ ATEEC 2026 — reproduction of the hybrid augmentation (CVAE + SMOTE) experiment
 
 All tables are produced by ONE consistent protocol:
   * 5-fold x 2-repeat stratified cross-validation (fixed seed).
-  * Preprocessing and augmentation on the training fold ONLY.
+  * Preprocessing (missForest imputation, min-max scaling) and augmentation
+    are fitted on the training fold ONLY; the test fold is transformed with
+    the training-fold estimates.
   * 6 core classifiers (main result) + an extended set of 15 classifiers (robustness).
   * Naive protocol: augment the full data -> then CV (demonstrates data leakage).
 
@@ -34,6 +36,7 @@ from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 
 from hybrid_augmentation import hybrid_augment, minmax_fit, minmax_apply, SEED
+from missforest import MissForest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -91,8 +94,9 @@ def run():
         nc = len(np.unique(y))
 
         # --- NAIVE (plain accuracy): augment full data -> 5x2 CV (leakage) ---
-        mn, rg = minmax_fit(X)
-        Xall = minmax_apply(X, mn, rg)
+        Ximp = MissForest(random_state=SEED).fit_transform(X)      # imputed on the FULL data
+        mn, rg = minmax_fit(Ximp)
+        Xall = minmax_apply(Ximp, mn, rg)
         Xh, yh, _, _ = hybrid_augment(Xall, y, nc)
         for tr, te in RepeatedStratifiedKFold(n_splits=N_SPLITS, n_repeats=N_REPEATS,
                                               random_state=SEED).split(Xh, yh):
@@ -106,10 +110,12 @@ def run():
         for tr, te in RepeatedStratifiedKFold(n_splits=N_SPLITS, n_repeats=N_REPEATS,
                                               random_state=SEED).split(X, y):
             Xtr, Xte, ytr, yte = X[tr], X[te], y[tr], y[te]
-            m, r = minmax_fit(Xtr)
-            Xs, Xts = minmax_apply(Xtr, m, r), minmax_apply(Xte, m, r)
+            mf = MissForest(random_state=SEED).fit(Xtr)                # training fold only
+            Xtr_i, Xte_i = mf.train_imputed_, mf.transform(Xte)
+            m, r = minmax_fit(Xtr_i)
+            Xs, Xts = minmax_apply(Xtr_i, m, r), minmax_apply(Xte_i, m, r)
             Xa, ya, n_sm, n_cv = hybrid_augment(Xs, ytr, nc)
-            if len(comp) < len(DATASETS):
+            if not any(c["ds"] == ds for c in comp):   # first fold of each dataset
                 comp.append(dict(ds=ds, n_tr=len(Xs), smote=n_sm, cvae=n_cv,
                                  total=len(Xa), cls_tr=np.bincount(ytr).tolist(),
                                  cls_aug=np.bincount(ya).tolist()))

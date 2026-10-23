@@ -20,6 +20,7 @@ from sklearn.decomposition import PCA
 from imblearn.over_sampling import SMOTE
 
 from hybrid_augmentation import train_cvae, cvae_sample, minmax_fit, minmax_apply, _k_neighbors
+from missforest import MissForest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -56,6 +57,7 @@ def synthetic_quality(ds="pelvic"):
     feats = list(d.columns[:-1])
     X = d[feats].values.astype(float); y = d.iloc[:, -1].values.astype(int)
     nc = len(np.unique(y))
+    X = MissForest(random_state=123).fit_transform(X)   # no-op for complete data (e.g. Pelvic)
     mn, rg = minmax_fit(X); Xs = minmax_apply(X, mn, rg)
     Xsm, ysm = SMOTE(k_neighbors=_k_neighbors(y), random_state=123).fit_resample(Xs, y)
     Xsm_new = Xsm[np.arange(len(Xsm)) >= len(Xs)]

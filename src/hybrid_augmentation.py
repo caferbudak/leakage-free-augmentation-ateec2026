@@ -34,9 +34,9 @@ def minmax_fit(X: np.ndarray):
 
 
 def minmax_apply(X: np.ndarray, mn: np.ndarray, rg: np.ndarray) -> np.ndarray:
-    """Fills missing values with the column median and scales to [0, 1]."""
-    Xf = np.where(np.isnan(X), np.nanmedian(X, 0), X)
-    return np.clip((Xf - mn) / rg, 0.0, 1.0)
+    """Scales to [0, 1] with training-fold statistics (X must already be imputed,
+    see missforest.MissForest)."""
+    return np.clip((X - mn) / rg, 0.0, 1.0)
 
 
 def _k_neighbors(y: np.ndarray) -> int:

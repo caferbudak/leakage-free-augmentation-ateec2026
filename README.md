@@ -21,7 +21,7 @@ Augmented training set: `D_aug = D_SMOTE ∪ D_CVAE`. Loss:
 `L = ||x − x̂||² + β · D_KL(q(z|x,y) || N(0, I))`.
 
 **Evaluation principle (leakage-free):** the data are first split into
-stratified training and test folds; preprocessing (median imputation, min–max
+stratified training and test folds; preprocessing (missForest imputation, min–max
 scaling to [0, 1]) and augmentation are estimated/applied **on the training fold
 only**, and the test fold is kept out of every step. In addition, a **naive**
 protocol (augmenting the full data before splitting) shows how data leakage
@@ -65,18 +65,21 @@ python src/make_figures.py
 ```
 
 Protocol: **5-fold × 2-repeat stratified cross-validation**, fixed seed
-(`SEED=123`). CVAE: latent dimension 6, hidden layer 32, 250 epochs, `β=0.1`.
+(`SEED=123`). Missing values (Hepatitis, Heart Disease) are imputed with
+missForest (Stekhoven & Bühlmann, *Bioinformatics* 28(1):112–118, 2012;
+random forests with 100 trees, regression for continuous and classification for
+binary/low-level variables), fitted on the training fold and applied to the test fold. CVAE: latent dimension 6, hidden layer 32, 250 epochs, `β=0.1`.
 Main evaluation with 6 core classifiers; 15 classifiers for robustness.
 
 ## Expected results (leakage-free, 6 core classifiers)
 
 | Metric | Baseline | Hybrid augmentation | Δ (percentage points) |
 |---|---:|---:|---:|
-| Balanced accuracy | 79.44 | 81.58 | **+2.14** |
-| Macro-F1 | 80.17 | 80.90 | +0.73 |
-| Plain accuracy | 84.11 | 83.65 | −0.46 |
+| Balanced accuracy | 79.62 | 82.11 | **+2.49** |
+| Macro-F1 | 80.35 | 81.47 | +1.11 |
+| Plain accuracy | 84.21 | 84.03 | −0.18 |
 
-The gain is positive on all 7 datasets and in 35 of the 42 dataset–classifier
+The gain is positive on all 7 datasets and in 36 of the 42 dataset–classifier
 combinations. **Dataset-level paired Wilcoxon** test (main test): `p = 0.016`.
 The naive protocol artificially inflates plain accuracy by ~6.7 percentage
 points; this gain disappears under the leakage-free protocol.
@@ -94,11 +97,12 @@ points; this gain disappears under the leakage-free protocol.
 ├── data/datasets_verified/      # 7 UCI datasets (+ validation summary)
 ├── src/
 │   ├── hybrid_augmentation.py   # method: CVAE + SMOTE
+│   ├── missforest.py            # missForest imputation (fit on training fold)
 │   ├── run_experiments.py       # reproduces all tables (5x2)
 │   └── make_figures.py          # data-driven figures
 ├── results/results_unified_5x2.csv
 ├── figures/                     # Figure 1 (flow), Figure 2 (CVAE architecture)
-└── paper/Budak_ATEEC_2026_v7.docx
+└── paper/Budak_ATEEC_2026_v8.docx
 ```
 
 Figure 1 (method flow) and Figure 2 (CVAE architecture) are schematic drawings;
