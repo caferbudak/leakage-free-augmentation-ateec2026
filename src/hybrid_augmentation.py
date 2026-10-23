@@ -6,9 +6,9 @@ interpolation.
 ATEEC 2026 — Assoc. Prof. Cafer Budak, Dicle University.
 
 Method:
-  D_aug = D_SMOTE ∪ D_CVAE
-    D_SMOTE : SMOTE oversamples the minority class up to the majority class
-              size (class balance).
+  D_aug = [D_SMOTE ; D_CVAE]   (row-wise concatenation, duplicates kept)
+    D_SMOTE : original training samples + SMOTE minority samples; the minority
+              class is oversampled up to the majority class size (class balance).
     D_CVAE  : the class-conditional VAE draws one synthetic sample from the
               prior (z ~ N(0, I)) for every training sample (diversity
               beyond the convex hull of the data).

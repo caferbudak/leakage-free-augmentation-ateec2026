@@ -10,9 +10,12 @@ All tables are produced by ONE consistent protocol:
   * Naive protocol: augment the full data -> then CV (demonstrates data leakage).
 
 Run:
-    python src/run_experiments.py
+    python src/run_experiments.py              # 7 development datasets
+    python src/run_experiments.py --external   # 4 external validation datasets
+                                               # (frozen method, never used in method selection)
 Output:
-    results/results_unified_5x2.csv  (raw per-fold results)
+    results/results_unified_5x2.csv   (development, raw per-fold results)
+    results/results_external_5x2.csv  (external validation, raw per-fold results)
     console: Tables II/III/IV, Wilcoxon tests, D_aug composition.
 """
 from __future__ import annotations
@@ -42,9 +45,16 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 DATA = os.path.join(ROOT, "data", "datasets_verified")
 RESULTS = os.path.join(ROOT, "results")
+OUT_NAME = "results_unified_5x2.csv"
 
 DATASETS = ["pelvic", "hepatitis", "parkinsons", "heart_disease",
             "pima_diabetes", "glass", "sonar"]
+
+# External validation: datasets selected before seeing any result, never used in
+# method selection (public UCI, N <= 1000, binary or binarised, numeric features).
+EXTERNAL_DATA = os.path.join(ROOT, "data", "external_validation")
+EXTERNAL_DATASETS = ["ionosphere", "haberman", "ecoli", "wdbc"]
+EXTERNAL_OUT_NAME = "results_external_5x2.csv"
 N_SPLITS, N_REPEATS = 5, 2
 
 
@@ -136,7 +146,7 @@ def run():
 
     R = pd.DataFrame(rows)
     os.makedirs(RESULTS, exist_ok=True)
-    R.to_csv(os.path.join(RESULTS, "results_unified_5x2.csv"), index=False)
+    R.to_csv(os.path.join(RESULTS, OUT_NAME), index=False)
     report(R, comp, list(core.keys()))
 
 
@@ -171,7 +181,8 @@ def report(R, comp, CORE):
     gv = c6[c6.proto == "lf"].groupby("ds").bal.mean()
     wd = stats.wilcoxon(gv, gb)
     print(f"  Pos/neg cells: {(dd>0).sum()}/{(dd<0).sum()}")
-    print(f"  Wilcoxon cells(42) p={wc.pvalue:.2e} (supplementary) ; datasets(7) p={wd.pvalue:.3f} (MAIN)")
+    print(f"  Wilcoxon cells({len(dd)}) p={wc.pvalue:.2e} (supplementary) ; "
+          f"datasets({len(gb)}) p={wd.pvalue:.3f} (MAIN)")
 
     b15 = cm(R[R.proto == "base"], "bal"); v15 = cm(R[R.proto == "lf"], "bal")
     print(f"\n=== ROBUSTNESS (15 classifiers) ΔBA = {(v15.mean()-b15.mean())*100:+.2f} pp "
@@ -182,4 +193,7 @@ def report(R, comp, CORE):
 
 
 if __name__ == "__main__":
+    import sys
+    if "--external" in sys.argv:
+        DATA, DATASETS, OUT_NAME = EXTERNAL_DATA, EXTERNAL_DATASETS, EXTERNAL_OUT_NAME
     run()

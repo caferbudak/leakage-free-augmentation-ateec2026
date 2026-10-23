@@ -1,0 +1,5 @@
+file,n,features,classes,imbalance,missing_cells,note
+ionosphere,351,34,"{0: 225, 1: 126}",1.79,0,"UCI Ionosphere; target 1=bad (b), 0=good (g)"
+haberman,306,3,"{0: 225, 1: 81}",2.78,0,UCI Haberman's Survival; target 1=died within 5 years (class 2)
+ecoli,336,7,"{0: 301, 1: 35}",8.6,0,UCI Ecoli; binarised as imU vs rest (imbalanced-learn benchmark definition)
+wdbc,569,30,"{0: 357, 1: 212}",1.68,0,UCI Breast Cancer Wisconsin (Diagnostic) via scikit-learn; target 1=malignant
