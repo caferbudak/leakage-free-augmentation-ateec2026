@@ -144,7 +144,7 @@ dataset-level values.
 │   ├── results_external_5x2.csv # external validation, raw per-fold results
 │   └── supplementary_table_S1.csv
 ├── figures/                     # Figure 1 (flow), Figure 2 (CVAE architecture)
-└── paper/Budak_ATEEC_2026_v9.docx
+└── paper/Budak_ATEEC_2026_v10.docx
 ```
 
 Figure 1 (method flow) and Figure 2 (CVAE architecture) are schematic drawings;
