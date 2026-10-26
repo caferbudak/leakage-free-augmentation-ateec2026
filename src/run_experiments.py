@@ -16,6 +16,11 @@ Run:
 Output:
     results/results_unified_5x2.csv   (development, raw per-fold results)
     results/results_external_5x2.csv  (external validation, raw per-fold results)
+    Columns: ds, model, proto (base = no augmentation, lf = leakage-free hybrid
+    augmentation, naive = augmentation before splitting), repeat (1-2),
+    fold (1-5), acc, bal (balanced accuracy), f1 (macro-F1).
+    Folds come from RepeatedStratifiedKFold(n_splits=5, n_repeats=2,
+    random_state=123); base and lf use the same splits for every classifier.
     console: Tables II/III/IV, Wilcoxon tests, D_aug composition.
 """
 from __future__ import annotations
@@ -108,17 +113,19 @@ def run():
         mn, rg = minmax_fit(Ximp)
         Xall = minmax_apply(Ximp, mn, rg)
         Xh, yh, _, _ = hybrid_augment(Xall, y, nc)
-        for tr, te in RepeatedStratifiedKFold(n_splits=N_SPLITS, n_repeats=N_REPEATS,
-                                              random_state=SEED).split(Xh, yh):
+        for k, (tr, te) in enumerate(RepeatedStratifiedKFold(
+                n_splits=N_SPLITS, n_repeats=N_REPEATS, random_state=SEED).split(Xh, yh)):
+            rep, fold = k // N_SPLITS + 1, k % N_SPLITS + 1
             for nm, proto in core.items():
                 p = _safe_predict(proto, Xh[tr], yh[tr], Xh[te])
                 if p is not None:
-                    rows.append(dict(ds=ds, model=nm, proto="naive",
+                    rows.append(dict(ds=ds, model=nm, proto="naive", repeat=rep, fold=fold,
                                      acc=accuracy_score(yh[te], p), bal=np.nan, f1=np.nan))
 
         # --- BASELINE + LEAK-FREE (5x2) ---
-        for tr, te in RepeatedStratifiedKFold(n_splits=N_SPLITS, n_repeats=N_REPEATS,
-                                              random_state=SEED).split(X, y):
+        for k, (tr, te) in enumerate(RepeatedStratifiedKFold(
+                n_splits=N_SPLITS, n_repeats=N_REPEATS, random_state=SEED).split(X, y)):
+            rep, fold = k // N_SPLITS + 1, k % N_SPLITS + 1
             Xtr, Xte, ytr, yte = X[tr], X[te], y[tr], y[te]
             mf = MissForest(random_state=SEED).fit(Xtr)                # training fold only
             Xtr_i, Xte_i = mf.train_imputed_, mf.transform(Xte)
@@ -133,12 +140,12 @@ def run():
                 pb = _safe_predict(proto, Xs, ytr, Xts)
                 pv = _safe_predict(proto, Xa, ya, Xts)
                 if pb is not None:
-                    rows.append(dict(ds=ds, model=nm, proto="base",
+                    rows.append(dict(ds=ds, model=nm, proto="base", repeat=rep, fold=fold,
                                      acc=accuracy_score(yte, pb),
                                      bal=balanced_accuracy_score(yte, pb),
                                      f1=f1_score(yte, pb, average="macro")))
                 if pv is not None:
-                    rows.append(dict(ds=ds, model=nm, proto="lf",
+                    rows.append(dict(ds=ds, model=nm, proto="lf", repeat=rep, fold=fold,
                                      acc=accuracy_score(yte, pv),
                                      bal=balanced_accuracy_score(yte, pv),
                                      f1=f1_score(yte, pv, average="macro")))

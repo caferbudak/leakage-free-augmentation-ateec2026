@@ -29,7 +29,6 @@ def load():
         R = pd.read_csv(os.path.join(RESULTS, fn))
         R = R[R.proto.isin(["base", "lf"])].copy()
         R["set"] = name
-        R["fold"] = R.groupby(["ds", "model", "proto"]).cumcount()
         frames.append(R)
     return pd.concat(frames, ignore_index=True)
 
@@ -49,7 +48,7 @@ def supplementary(R):
 
 def table_iv(R):
     C = R[R.model.isin(CORE)]
-    per_fold = C.groupby(["set", "ds", "fold", "proto"])[["bal", "f1"]].mean().unstack("proto") * 100
+    per_fold = C.groupby(["set", "ds", "repeat", "fold", "proto"])[["bal", "f1"]].mean().unstack("proto") * 100
     d = pd.DataFrame({"dba": per_fold[("bal", "lf")] - per_fold[("bal", "base")],
                       "df1": per_fold[("f1", "lf")] - per_fold[("f1", "base")]})
     cell = C.groupby(["set", "ds", "model", "proto"])[["bal", "f1"]].mean().unstack("proto") * 100

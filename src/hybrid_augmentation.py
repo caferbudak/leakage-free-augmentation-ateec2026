@@ -10,8 +10,8 @@ Method:
     D_SMOTE : original training samples + SMOTE minority samples; the minority
               class is oversampled up to the majority class size (class balance).
     D_CVAE  : the class-conditional VAE draws one synthetic sample from the
-              prior (z ~ N(0, I)) for every training sample (diversity
-              beyond the convex hull of the data).
+              prior (z ~ N(0, I)) for every training sample (intended to
+              add diversity beyond the convex hull of the data).
 Augmentation is applied ONLY to the training fold (leakage-free protocol).
 """
 from __future__ import annotations
