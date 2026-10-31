@@ -1,11 +1,11 @@
 """
-Builds the per-dataset summary used in Table IV of the paper and the full
+Builds the per-dataset summary used in Table V of the paper and the full
 dataset x classifier breakdown (Supplementary Table S1) from the raw results.
 
 Inputs : results/results_unified_5x2.csv   (development datasets)
          results/results_external_5x2.csv  (external validation datasets)
 Outputs: results/supplementary_table_S1.csv
-         console: Table IV rows (6 core classifiers; Δ ± SD over the 10 folds)
+         console: Table V rows (6 core classifiers; Δ ± SD over the 10 folds)
 
 Aggregation: for every dataset-classifier pair the 10 folds (5-fold x 2 repeats)
 are averaged; dataset values are the mean over the 6 core classifiers; the SD of
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     pd.set_option("display.width", 200)
     for s in ["development", "external"]:
         X = T[T.set == s].drop(columns="set")
-        print(f"\n=== TABLE IV — {s} (6 core, %, Δ ± SD over folds) ===")
+        print(f"\n=== TABLE V — {s} (6 core, %, Δ ± SD over folds) ===")
         print(X.round(2).to_string(index=False))
         m = X.drop(columns=["ds", "dba_sd", "df1_sd"]).mean()
         print("  MEAN", m.round(2).to_dict())

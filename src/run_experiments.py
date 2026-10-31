@@ -21,7 +21,7 @@ Output:
     fold (1-5), acc, bal (balanced accuracy), f1 (macro-F1).
     Folds come from RepeatedStratifiedKFold(n_splits=5, n_repeats=2,
     random_state=123); base and lf use the same splits for every classifier.
-    console: Tables II/III/IV, Wilcoxon tests, D_aug composition.
+    console: Tables III/IV/V, Wilcoxon tests, D_aug composition.
 """
 from __future__ import annotations
 import os
@@ -165,19 +165,19 @@ def report(R, comp, CORE):
     naive = cm(c6[c6.proto == "naive"], "acc")
     lf = cm(c6[c6.proto == "lf"], "acc")
 
-    print("\n=== TABLE II (per classifier, plain accuracy %, 6 core) ===")
+    print("\n=== TABLE III (per classifier, plain accuracy %, 6 core) ===")
     for m in CORE:
         b, n, l = base.xs(m, level=1).mean(), naive.xs(m, level=1).mean(), lf.xs(m, level=1).mean()
         print(f"  {m:14s} Orig {b*100:.2f}  Naive {n*100:.2f} ({(n-b)*100:+.2f})  LeakFree {l*100:.2f} ({(l-b)*100:+.2f})")
     B, N, L = base.groupby('model').mean().mean(), naive.groupby('model').mean().mean(), lf.groupby('model').mean().mean()
     print(f"  MEAN           Orig {B*100:.2f}  Naive {N*100:.2f} ({(N-B)*100:+.2f})  LeakFree {L*100:.2f} ({(L-B)*100:+.2f})")
 
-    print("\n=== TABLE III (per dataset, plain accuracy %, 6 core) ===")
+    print("\n=== TABLE IV (per dataset, plain accuracy %, 6 core) ===")
     for ds in DATASETS:
         b, n, l = base.xs(ds, level=0).mean(), naive.xs(ds, level=0).mean(), lf.xs(ds, level=0).mean()
         print(f"  {ds:14s} Orig {b*100:.2f}  Naive {n*100:.2f} ({(n-b)*100:+.2f})  LeakFree {l*100:.2f} ({(l-b)*100:+.2f})")
 
-    print("\n=== TABLE IV (6 core, leakage-free: Baseline -> Hybrid augmentation) ===")
+    print("\n=== TABLE V (6 core, leakage-free: Baseline -> Hybrid augmentation) ===")
     for val, nm in [("bal", "Balanced accuracy"), ("f1", "Macro-F1"), ("acc", "Plain accuracy")]:
         b = cm(c6[c6.proto == "base"], val); v = cm(c6[c6.proto == "lf"], val)
         print(f"  {nm:16s} {b.mean()*100:.2f} -> {v.mean()*100:.2f}  (Δ {(v.mean()-b.mean())*100:+.2f})")

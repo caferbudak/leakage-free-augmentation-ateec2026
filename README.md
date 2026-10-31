@@ -3,8 +3,8 @@
 This repository contains the complete code, data and results of the **ATEEC 2026**
 paper "Leakage-Free Evaluation of Variational Autoencoder and SMOTE-Based
 Oversampling for Small and Imbalanced Tabular Data" (*Assoc. Prof. Cafer Budak*,
-Dicle University), in a fully **reproducible** form. The paper itself is written
-in Turkish (`paper/`). All results in the paper were produced with release
+Dicle University), in a fully **reproducible** form. The paper (English) is in
+`paper/`. All results in the paper were produced with release
 **`v1.0-ateec2026`** of this repository.
 
 ## Method
@@ -21,7 +21,9 @@ samples from two complementary sources:
 
 `D_SMOTE` contains the original training samples and the SMOTE minority samples;
 `D_CVAE` contains one CVAE sample per training sample. The augmented training set
-is their row-wise concatenation with duplicates kept: `D_aug = [D_SMOTE ; D_CVAE]`.
+is their row-wise concatenation with duplicates kept: `D_aug = [D_SMOTE ; D_CVAE]`,
+so `|D_aug| = N + N + (n_maj − n_min)` for a training fold of size
+`N = n_maj + n_min` (e.g. Pelvic: 168/80 → 336/248; Table I of the paper).
 Loss: `L = ||x − x̂||² + β · D_KL(q(z|x,y) || N(0, I))`.
 
 **Evaluation principle (leakage-free):** the data are first split into
@@ -101,7 +103,7 @@ the build matching your platform.
 ## Reproduction
 
 ```bash
-# Development datasets: Tables II and III, Wilcoxon tests, D_aug composition;
+# Development datasets: Tables III and IV, Wilcoxon tests, D_aug composition;
 # raw per-fold results -> results/results_unified_5x2.csv
 python src/run_experiments.py
 
@@ -109,7 +111,7 @@ python src/run_experiments.py
 # -> results/results_external_5x2.csv
 python src/run_experiments.py --external
 
-# Table IV (per-dataset balanced accuracy and macro-F1, Δ ± SD over folds) and
+# Table V (per-dataset balanced accuracy and macro-F1, Δ ± SD over folds) and
 # Supplementary Table S1 (all dataset × classifier results)
 # -> results/supplementary_table_S1.csv
 python src/make_supplementary.py
@@ -195,14 +197,14 @@ differences may arise from BLAS/threading.
 │   ├── hybrid_augmentation.py   # method: CVAE + SMOTE
 │   ├── missforest.py            # missForest imputation (fit on training fold)
 │   ├── run_experiments.py       # all experiments (5x2); --external for validation
-│   ├── make_supplementary.py    # Table IV and Supplementary Table S1
+│   ├── make_supplementary.py    # Table V and Supplementary Table S1
 │   └── make_figures.py          # data-driven figures
 ├── results/
 │   ├── results_unified_5x2.csv  # development, raw per-fold results
 │   ├── results_external_5x2.csv # external validation, raw per-fold results
 │   └── supplementary_table_S1.csv
 ├── figures/                     # Figure 1 (flow), Figure 2 (CVAE architecture)
-└── paper/Budak_ATEEC_2026_v10.docx
+└── paper/Budak_ATEEC_2026_v14_EN.docx
 ```
 
 Figure 1 (method flow) and Figure 2 (CVAE architecture) are schematic drawings;
