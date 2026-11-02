@@ -31,7 +31,7 @@ stratified training and test folds; preprocessing (missForest imputation, min–
 scaling to [0, 1]) and augmentation are estimated/applied **on the training fold
 only**, and the test fold is kept out of every step. In addition, a **naive**
 protocol (imputation, scaling and augmentation of the full data before splitting)
-shows how data leakage inflates performance.
+shows how data leakage artificially raises the performance estimate.
 
 ## Method selection and external validation
 
@@ -172,7 +172,7 @@ accuracy, `f1` = macro-F1).
   n = 11). The pooled test includes the seven development datasets used in
   method selection and is therefore not independent validation evidence.
   Macro-F1 +3.79.
-- The naive protocol artificially inflates plain accuracy by ~6.7 (development)
+- The naive protocol artificially raises plain accuracy by ~6.7 (development)
   and ~5.4 (external) percentage points; this gain disappears under the
   leakage-free protocol.
 
@@ -204,7 +204,7 @@ differences may arise from BLAS/threading.
 │   ├── results_external_5x2.csv # external validation, raw per-fold results
 │   └── supplementary_table_S1.csv
 ├── figures/                     # Figure 1 (flow), Figure 2 (CVAE architecture)
-└── paper/Budak_ATEEC_2026_v14_EN.docx
+└── paper/Budak_ATEEC_2026_v15_EN.docx
 ```
 
 Figure 1 (method flow) and Figure 2 (CVAE architecture) are schematic drawings;
@@ -213,7 +213,9 @@ Figure 1 (method flow) and Figure 2 (CVAE architecture) are schematic drawings;
 ## Citation
 
 > C. Budak, "Leakage-Free Evaluation of Variational Autoencoder and SMOTE-Based
-> Oversampling for Small and Imbalanced Tabular Data," ATEEC 2026.
+> Oversampling for Small and Imbalanced Tabular Data," in Proc. IEEE Int. Conf.
+> Advanced Technologies in Electrical, Electronics and Computing Engineering
+> (ATEEC 2026), Diyarbakır, Türkiye, Nov. 2026.
 > Code and data: https://github.com/caferbudak/leakage-free-augmentation-ateec2026 (release v1.0-ateec2026)
 
 ## License
